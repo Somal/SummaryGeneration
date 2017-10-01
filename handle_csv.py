@@ -1,5 +1,6 @@
 import csv
 import datetime
+from create_spreadsheet import create_spreadsheet
 
 PROBLEM_HASHTAG = '#косяк'
 GOAL_HASHTAG = '#цель'
@@ -54,3 +55,4 @@ for l in csvdictreader:
 
 uncompleted = sorted(uncompleted, key=lambda x: x['Priority'], reverse=True)
 output_dict = {'completed': completed, 'uncompleted': uncompleted, 'problems': problems, 'goals': goals}
+create_spreadsheet(output_dict)
