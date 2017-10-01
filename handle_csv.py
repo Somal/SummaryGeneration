@@ -1,11 +1,14 @@
 import csv
 import datetime
 from openpyxl import load_workbook, Workbook
+from openpyxl.styles import Alignment, PatternFill, Color, colors
 
 PROBLEM_HASHTAG = '#косяк'
 GOAL_DAY_HASHTAG = '#цельнадень'
 GOAL_WEEK_HASHTAG = '#цельнанеделю'
 N = 200
+red = PatternFill(fgColor=colors.RED, fill_type='solid')
+green = PatternFill(fgColor=colors.GREEN, fill_type='solid')
 
 
 def set_value(ws, i, j, value):
@@ -87,6 +90,9 @@ except Exception as e:
     wb.save(sum_filename)
 
 ws = wb.get_sheet_by_name(today_str)
+for i in range(N):
+    for j in range(N):
+        ws.cell(row=i + 1, column=j + 1).alignment = Alignment(horizontal='center', vertical='center')
 set_value(ws, 0, 0, 'Цель на неделю')
 set_value(ws, 0, 1, 'Цель на день')
 set_value(ws, 0, 2, 'Косяки')
@@ -98,6 +104,7 @@ for i, goal in enumerate(goals_on_day):
 
 for i, pr in enumerate(problems):
     set_value(ws, i + 1, 2, pr['Title'])
+    ws.cell(row=i + 2, column=3).fill = green if pr['Status'] == '2' else red
 
 task_col = 4
 set_value(ws, 0, task_col, 'Выполненные задачи')
