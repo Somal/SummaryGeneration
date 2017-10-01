@@ -1,7 +1,8 @@
 import csv
 import datetime
+
 from openpyxl import load_workbook, Workbook
-from openpyxl.styles import Alignment, PatternFill, Color, colors
+from openpyxl.styles import Alignment, PatternFill, colors
 
 PROBLEM_HASHTAG = '#косяк'
 GOAL_DAY_HASHTAG = '#цельнадень'
@@ -96,6 +97,7 @@ for i in range(N):
 set_value(ws, 0, 0, 'Цель на неделю')
 set_value(ws, 0, 1, 'Цель на день')
 set_value(ws, 0, 2, 'Косяки')
+# ws.column_dimensions['A'].width = 20
 for i, goal in enumerate(goals_on_week):
     set_value(ws, i + 1, 0, goal['Title'])
 
@@ -127,5 +129,13 @@ ws.merge_cells(start_row=retro_row + 1, start_column=3, end_row=retro_row + 1, e
 set_value(ws, retro_row, 2, 'Ретро')
 ws.merge_cells(start_row=retro_row + 2, start_column=3, end_row=retro_row + 5, end_column=4)
 
+# Add autocorrection of width
+dims = {}
+for row in ws.rows:
+    for cell in row:
+        if cell.value:
+            dims[cell.column] = max((dims.get(cell.column, 0), len(cell.value)))
+for col, value in dims.items():
+    ws.column_dimensions[col].width = value + 1
 wb.save(sum_filename)
 wb.close()
