@@ -45,7 +45,7 @@ for l in csvdictreader:
     # Completed
     if completed_time.startswith(today_str) and status == '2':
         completed.append(l)
-    elif title.find(PROBLEM_HASHTAG) >= 0:
+    elif title.find(PROBLEM_HASHTAG) >= 0 and status == '0':
         problems.append(l)
     elif title.find(GOAL_DAY_HASHTAG) >= 0:
         goals_on_day.append(l)
@@ -99,6 +99,11 @@ for i, c in enumerate(completed):
 for i, uc in enumerate(uncompleted):
     output[i + 1][task_col + 2] = uc['Title']
     output[i + 1][task_col + 3] = uc['Priority']
+
+retro_row = max(len(problems), max(len(goals_on_day), len(goals_on_week))) + 2
+output[retro_row][0] = '+'
+output[retro_row][1] = '-'
+output[retro_row][2] = 'Ретро'
 
 for i in range(N):
     csv_writer.writerow(output[i])
