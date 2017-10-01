@@ -1,5 +1,6 @@
 import csv
 import datetime
+from openpyxl import load_workbook, Workbook
 
 PROBLEM_HASHTAG = '#косяк'
 GOAL_DAY_HASHTAG = '#цельнадень'
@@ -107,3 +108,18 @@ output[retro_row][2] = 'Ретро'
 
 for i in range(N):
     csv_writer.writerow(output[i])
+
+# Excel
+sum_filename = sum_filename[:-4] + '.xlsx'
+wb_existed = False
+try:
+    wb = load_workbook(sum_filename)
+    wb_existed = True
+except Exception as e:
+    wb = Workbook()
+
+ws = wb.create_sheet(today_str, 0)
+print(wb.sheetnames)
+wb.save(sum_filename)
+
+wb.close()
