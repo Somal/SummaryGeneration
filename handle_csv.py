@@ -64,8 +64,10 @@ completed = sorted(completed, key=lambda x: x['Priority'], reverse=True)
 
 
 first_date = today - datetime.timedelta(days=today.weekday())
-last_date = first_date + datetime.timedelta(days=6)
-sum_filename = "summaries/Summary_of_week_{}-{}.csv".format(first_date, last_date)
+week_days = [first_date]
+for i in range(1, 7):
+    week_days.append(first_date + datetime.timedelta(days=i))
+sum_filename = "summaries/Summary_of_week_{}-{}.csv".format(week_days[0], week_days[-1])
 
 output = []
 for i in range(N):
@@ -117,9 +119,14 @@ try:
     wb_existed = True
 except Exception as e:
     wb = Workbook()
+    sheet_names = wb.get_sheet_names()
+    for ws_names in sheet_names:
+        wb.remove_sheet(wb.get_sheet_by_name(ws_names))
+    for day in reversed(week_days):
+        ws = wb.create_sheet(str(day), 0)
+    wb.save(sum_filename)
 
-ws = wb.create_sheet(today_str, 0)
-print(wb.sheetnames)
+ws_today = wb.get_sheet_by_name(today_str)
 wb.save(sum_filename)
 
 wb.close()
