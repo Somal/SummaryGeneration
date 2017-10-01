@@ -67,15 +67,11 @@ first_date = today - datetime.timedelta(days=today.weekday())
 week_days = [first_date]
 for i in range(1, 7):
     week_days.append(first_date + datetime.timedelta(days=i))
-sum_filename = "summaries/Summary_of_week_{}-{}.csv".format(week_days[0], week_days[-1])
 
 output = []
 for i in range(N):
     tmp = [''] * N
     output.append(tmp)
-
-sum_file = open(sum_filename, 'w')
-csv_writer = csv.writer(sum_file)
 
 output[0][0] = 'Цель на неделю'
 output[0][1] = 'Цель на день'
@@ -91,9 +87,9 @@ for i, pr in enumerate(problems):
 
 task_col = 4
 output[0][task_col] = 'Выполненные задачи'
-output[0][task_col + 1] = 'Их приоритеты'
+output[0][task_col + 1] = 'Приоритеты'
 output[0][task_col + 2] = 'Невыполненные задачи'
-output[0][task_col + 3] = 'Их приоритеты'
+output[0][task_col + 3] = 'Приоритеты'
 
 for i, c in enumerate(completed):
     output[i + 1][task_col] = c['Title']
@@ -108,11 +104,8 @@ output[retro_row][0] = '+'
 output[retro_row][1] = '-'
 output[retro_row][2] = 'Ретро'
 
-for i in range(N):
-    csv_writer.writerow(output[i])
-
 # Excel
-sum_filename = sum_filename[:-4] + '.xlsx'
+sum_filename = "summaries/Summary_of_week_{}-{}.xlsx".format(week_days[0], week_days[-1])
 wb_existed = False
 try:
     wb = load_workbook(sum_filename)
@@ -127,6 +120,9 @@ except Exception as e:
     wb.save(sum_filename)
 
 ws_today = wb.get_sheet_by_name(today_str)
-wb.save(sum_filename)
+for i in range(27):
+    for j in range(N):
+        ws_today.cell(row=i + 1, column=j + 1).value = output[i][j]
 
+wb.save(sum_filename)
 wb.close()
