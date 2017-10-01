@@ -7,7 +7,16 @@ GOAL_DAY_HASHTAG = '#цельнадень'
 GOAL_WEEK_HASHTAG = '#цельнанеделю'
 N = 200
 
+
+def set_value(ws, i, j, value):
+    ws.cell(row=i + 1, column=j + 1).value = value
+
+
 today = datetime.date.today()
+first_date = today - datetime.timedelta(days=today.weekday())
+week_days = [first_date]
+for i in range(1, 7):
+    week_days.append(first_date + datetime.timedelta(days=i))
 today_str = str(today)
 filename = "backups/TickTick-backup-{}.csv".format(today)
 date_format = '%Y-%m-%dT%X%z'
@@ -62,48 +71,6 @@ uncompleted = sorted(uncompleted, key=lambda x: x['Priority'], reverse=True)
 completed = sorted(completed, key=lambda x: x['Priority'], reverse=True)
 # output_dict = {'completed': completed, 'uncompleted': uncompleted, 'problems': problems, 'goals': goals}
 
-
-first_date = today - datetime.timedelta(days=today.weekday())
-week_days = [first_date]
-for i in range(1, 7):
-    week_days.append(first_date + datetime.timedelta(days=i))
-
-output = []
-for i in range(N):
-    tmp = [''] * N
-    output.append(tmp)
-
-output[0][0] = 'Цель на неделю'
-output[0][1] = 'Цель на день'
-output[0][2] = 'Косяки'
-for i, goal in enumerate(goals_on_week):
-    output[i + 1][0] = goal['Title']
-
-for i, goal in enumerate(goals_on_day):
-    output[i + 1][1] = goal['Title']
-
-for i, pr in enumerate(problems):
-    output[i + 1][2] = pr['Title']
-
-task_col = 4
-output[0][task_col] = 'Выполненные задачи'
-output[0][task_col + 1] = 'Приоритеты'
-output[0][task_col + 2] = 'Невыполненные задачи'
-output[0][task_col + 3] = 'Приоритеты'
-
-for i, c in enumerate(completed):
-    output[i + 1][task_col] = c['Title']
-    output[i + 1][task_col + 1] = c['Priority']
-
-for i, uc in enumerate(uncompleted):
-    output[i + 1][task_col + 2] = uc['Title']
-    output[i + 1][task_col + 3] = uc['Priority']
-
-retro_row = max(len(problems), max(len(goals_on_day), len(goals_on_week))) + 2
-output[retro_row][0] = '+'
-output[retro_row][1] = '-'
-output[retro_row][2] = 'Ретро'
-
 # Excel
 sum_filename = "summaries/Summary_of_week_{}-{}.xlsx".format(week_days[0], week_days[-1])
 wb_existed = False
@@ -119,10 +86,37 @@ except Exception as e:
         ws = wb.create_sheet(str(day), 0)
     wb.save(sum_filename)
 
-ws_today = wb.get_sheet_by_name(today_str)
-for i in range(27):
-    for j in range(N):
-        ws_today.cell(row=i + 1, column=j + 1).value = output[i][j]
+ws = wb.get_sheet_by_name(today_str)
+set_value(ws, 0, 0, 'Цель на неделю')
+set_value(ws, 0, 1, 'Цель на день')
+set_value(ws, 0, 2, 'Косяки')
+for i, goal in enumerate(goals_on_week):
+    set_value(ws, i + 1, 0, goal['Title'])
+
+for i, goal in enumerate(goals_on_day):
+    set_value(ws, i + 1, 0, goal['Title'])
+
+for i, pr in enumerate(problems):
+    set_value(ws, i + 1, 2, pr['Title'])
+
+task_col = 4
+set_value(ws, 0, task_col, 'Выполненные задачи')
+set_value(ws, 0, task_col + 1, 'Приоритеты')
+set_value(ws, 0, task_col + 2, 'Невыполненные задачи')
+set_value(ws, 0, task_col + 3, 'Приоритеты')
+
+for i, c in enumerate(completed):
+    set_value(ws, i + 1, task_col, c['Title'])
+    set_value(ws, i + 1, task_col + 1, c['Priority'])
+
+for i, uc in enumerate(uncompleted):
+    set_value(ws, i + 1, task_col + 2, uc['Title'])
+    set_value(ws, i + 1, task_col + 3, uc['Priority'])
+
+retro_row = max(len(problems), max(len(goals_on_day), len(goals_on_week))) + 2
+set_value(ws, retro_row, 0, '+')
+set_value(ws, retro_row, 1, '-')
+set_value(ws, retro_row, 2, 'Ретро')
 
 wb.save(sum_filename)
 wb.close()
