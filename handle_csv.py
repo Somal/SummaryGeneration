@@ -32,7 +32,8 @@ fieldnames = next(csvreader)
 completed = []
 uncompleted = []
 problems = []
-goals = []
+goals_on_day = []
+goals_on_week = []
 csvdictreader = csv.DictReader(f, fieldnames=fieldnames)
 for l in csvdictreader:
     status = l['Status'].strip()
@@ -47,9 +48,9 @@ for l in csvdictreader:
     elif title.find(PROBLEM_HASHTAG) >= 0:
         problems.append(l)
     elif title.find(GOAL_DAY_HASHTAG) >= 0:
-        goals.append(l)
+        goals_on_day.append(l)
     elif title.find(GOAL_WEEK_HASHTAG) >= 0:
-        goals.append(l)
+        goals_on_week.append(l)
     # UnCompleted
     elif status == '0' and len(start_date) > 0:
         start_date = datetime.datetime.strptime(start_date, date_format).date()
@@ -57,6 +58,7 @@ for l in csvdictreader:
             uncompleted.append(l)
 
 uncompleted = sorted(uncompleted, key=lambda x: x['Priority'], reverse=True)
+completed = sorted(completed, key=lambda x: x['Priority'], reverse=True)
 # output_dict = {'completed': completed, 'uncompleted': uncompleted, 'problems': problems, 'goals': goals}
 
 
@@ -72,11 +74,31 @@ for i in range(N):
 sum_file = open(sum_filename, 'w')
 csv_writer = csv.writer(sum_file)
 
-task_row = 2
-output[task_row][0] = 'Выполненные задачи'
-output[task_row][1] = 'Их приоритеты'
-output[task_row][3] = 'Невыполненные задачи'
-output[task_row][4] = 'Их приоритеты'
+output[0][0] = 'Цель на неделю'
+output[0][1] = 'Цель на день'
+output[0][2] = 'Косяки'
+for i, goal in enumerate(goals_on_week):
+    output[i + 1][0] = goal['Title']
+
+for i, goal in enumerate(goals_on_day):
+    output[i + 1][1] = goal['Title']
+
+for i, pr in enumerate(problems):
+    output[i + 1][2] = pr['Title']
+
+task_col = 4
+output[0][task_col] = 'Выполненные задачи'
+output[0][task_col + 1] = 'Их приоритеты'
+output[0][task_col + 2] = 'Невыполненные задачи'
+output[0][task_col + 3] = 'Их приоритеты'
+
+for i, c in enumerate(completed):
+    output[i + 1][task_col] = c['Title']
+    output[i + 1][task_col + 1] = c['Priority']
+
+for i, uc in enumerate(uncompleted):
+    output[i + 1][task_col + 2] = uc['Title']
+    output[i + 1][task_col + 3] = uc['Priority']
 
 for i in range(N):
     csv_writer.writerow(output[i])
