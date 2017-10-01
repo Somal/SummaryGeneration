@@ -116,7 +116,9 @@ for i, uc in enumerate(uncompleted):
 retro_row = max(len(problems), max(len(goals_on_day), len(goals_on_week))) + 2
 set_value(ws, retro_row, 0, '+')
 set_value(ws, retro_row, 1, '-')
+ws.merge_cells(start_row=retro_row + 1, start_column=3, end_row=retro_row + 1, end_column=4)
 set_value(ws, retro_row, 2, 'Ретро')
+ws.merge_cells(start_row=retro_row + 2, start_column=3, end_row=retro_row + 5, end_column=4)
 
 wb.save(sum_filename)
 wb.close()
