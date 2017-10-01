@@ -1,2 +1,3 @@
 # Python 3.x. Tested on 3.5
 gspread
+oauth2client
